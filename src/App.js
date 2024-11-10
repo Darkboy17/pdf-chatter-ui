@@ -78,7 +78,7 @@ export default function App() {
 
       try {
 
-        await axios.get("https://pdf-qa-api.onrender.com/check-api-key");
+        await axios.get("https://darkboy18-myimage.sliplane.app/check-api-key");
         //toast.success(response.data.message);
 
       } catch (error) {

@@ -10,7 +10,11 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 export default function App() {
+
   // State variables
+
+  // URL of the backend API hosted on the cloud
+  const backendURL = "https://darkboy18-myimage.sliplane.app"
 
   // for storing the currently selected PDF
   const [selectedPDF, setSelectedPDF] = useState(null);
@@ -78,7 +82,7 @@ export default function App() {
 
       try {
 
-        await axios.get("https://darkboy18-myimage.sliplane.app/check-api-key");
+        await axios.get(`${backendURL}/check-api-key`);
         //toast.success(response.data.message);
 
       } catch (error) {

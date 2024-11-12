@@ -14,7 +14,7 @@ export default function App() {
   // State variables
 
   // URL of the backend API hosted on the cloud
-  const backendURL = "https://darkboy18-pdf-chatter.sliplane.app/"
+  const backendURL = "https://darkboy18-pdf-chatter.sliplane.app"
 
   // for storing the currently selected PDF
   const [selectedPDF, setSelectedPDF] = useState(null);

@@ -10,7 +10,7 @@ function UploadedPDFList({
 }) {
 
   // URL of the backend API hosted on the cloud
-  const backendURL = "https://darkboy18-pdf-chatter.sliplane.app/"
+  const backendURL = "https://darkboy18-pdf-chatter.sliplane.app"
 
   // State variables
   const [pdfFiles, setPdfFiles] = useState([]);

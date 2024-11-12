@@ -1,0 +1,1 @@
+export const backendURL = "https://darkboy18-pdf-chatter.sliplane.app";

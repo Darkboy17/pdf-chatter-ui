@@ -2,15 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import pdflogo from "../icons/pdf_logo.svg";
 import { toast } from "react-toastify";
+import { backendURL } from '../../src/config';
 
 function UploadedPDFList({
   onDocumentIdChange,
   refreshTrigger,
   onallDocsDeleted,
 }) {
-
-  // URL of the backend API hosted on the cloud
-  const backendURL = "https://darkboy18-pdf-chatter.sliplane.app"
 
   // State variables
   const [pdfFiles, setPdfFiles] = useState([]);

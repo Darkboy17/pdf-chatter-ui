@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+import { backendURL } from '../../src/config';
+
 const AskQuestion = ({ onSend, documentId, onReceiveResponse }) => {
 
-  // URL of the backend API hosted on the cloud
-  const backendURL = "https://darkboy18-pdf-chatter.sliplane.app"
 
   // State variable to store user input
   const [inputText, setInputText] = useState("");

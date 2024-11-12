@@ -2,11 +2,9 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import uploadlogo from "../icons/upload_logo.svg";
 import { toast } from "react-toastify";
+import { backendURL } from '../../src/config';
 
 function UploadPDF({ onFileUpload = () => {}, onUploadComplete }) {
-
-  // URL of the backend API hosted on the cloud
-  const backendURL = "https://darkboy18-pdf-chatter.sliplane.app"
 
   // State variables
 

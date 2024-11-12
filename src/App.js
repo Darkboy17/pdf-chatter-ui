@@ -9,12 +9,11 @@ import UploadedPDFList from "./components/UploadedPDFList";
 import { toast } from "react-toastify";
 import axios from "axios";
 
+import { backendURL } from '../src/config';
+
 export default function App() {
 
   // State variables
-
-  // URL of the backend API hosted on the cloud
-  const backendURL = "https://darkboy18-pdf-chatter.sliplane.app"
 
   // for storing the currently selected PDF
   const [selectedPDF, setSelectedPDF] = useState(null);

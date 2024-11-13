@@ -2,11 +2,12 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import uploadlogo from "../icons/upload_logo.svg";
 import { toast } from "react-toastify";
-import { backendURL } from '../../src/config';
 
 function UploadPDF({ onFileUpload = () => {}, onUploadComplete }) {
 
   // State variables
+
+  const backendURL = process.env.REACT_APP_API_BACKEND_URL;
 
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);

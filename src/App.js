@@ -9,11 +9,12 @@ import UploadedPDFList from "./components/UploadedPDFList";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-import { backendURL } from '../src/config';
 
 export default function App() {
 
   // State variables
+
+  const backendURL = process.env.REACT_APP_API_BACKEND_URL;
 
   // for storing the currently selected PDF
   const [selectedPDF, setSelectedPDF] = useState(null);

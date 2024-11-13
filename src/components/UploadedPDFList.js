@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import pdflogo from "../icons/pdf_logo.svg";
 import { toast } from "react-toastify";
-import { backendURL } from '../../src/config';
 
 function UploadedPDFList({
   onDocumentIdChange,
@@ -11,6 +10,9 @@ function UploadedPDFList({
 }) {
 
   // State variables
+
+  const backendURL = process.env.REACT_APP_API_BACKEND_URL;
+
   const [pdfFiles, setPdfFiles] = useState([]);
   const [selectedPDF, setSelectedPDF] = useState();
   const [showDropdown, setShowDropdown] = useState(false);

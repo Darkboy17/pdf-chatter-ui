@@ -176,9 +176,10 @@ function UploadedPDFList({
     }
   }, [refreshTrigger]);
 
+
   return (
-    <div className="relative">
-      <div className="mr-8 flex">
+    <div className="mb-10 md:mt-8">
+      <div className="flex">
         {selectedPDF && (
           <img
             src={pdflogo}
@@ -187,8 +188,9 @@ function UploadedPDFList({
           />
         )}
         <span
+          id="pdf-name"
           onClick={handlePDFClick}
-          className="text-green-600  py-1 rounded-full text-xs sm:text-sm font-medium cursor-pointer"
+          className="text-green-600 py-1 rounded-full text-xs sm:text-sm font-medium cursor-pointer"
         >
           {loading ? (
             <svg
@@ -211,8 +213,11 @@ function UploadedPDFList({
                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
               ></path>
             </svg>
-          ) : (
-            selectedPDF
+          ) :selectedPDF && (
+            <>
+            {selectedPDF.replace(/_/g, " ")} 
+            </>
+              
           )}
         </span>
       </div>

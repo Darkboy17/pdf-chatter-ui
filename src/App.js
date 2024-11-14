@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import UploadPDF from "./components/UploadPDF";
 import AskQuestion from "./components/AskQuestion";
-import logo from "./icons/AI-Planet-Logo.svg";
-import chatlogo from "./icons/ai_chat_logo.svg";
+import logo from "./icons/KLP-Logo.svg";
+import chatlogo from "./icons/KLP-chat-logo.svg";
 import userchatlogo from "./icons/user_chat_logo.svg";
 import UploadedPDFList from "./components/UploadedPDFList";
 import { toast } from "react-toastify";
@@ -115,14 +115,11 @@ export default function App() {
   return (
     <div className="overflow-hidden w-screen h-screen bg-gray-100 flex flex-col items-center">
       {/* Header */}
-      <header className="w-full h-18 max-h-18 overflow-hidden py-4 bg-white shadow-md flex items-center px-4 md:px-10 ">
+      <div className="md:flex justify-between w-full h-auto overflow-hidden py-4  bg-white shadow-md items-center px-4 md:px-4">
         {/* Logo */}
-        <div className="flex items-center space-x-2 flex-shrink-0">
-          <img src={logo} alt="AIP Logo" className="h-8 md:h-9" />
-        </div>
-
-        {/* Spacer to push content to the right */}
-        <div className="flex-grow"></div>
+        <div className="md:flex ml-1 md:ml-4 flex-shrink-0 border-0 border-black mb-2 px-2.5">
+          <img src={logo} alt="AIP Logo" className="h-6 md:h-8" />
+        </div>       
 
         {/* PDF Display */}
         <div className="flex space-x-2 items-center">
@@ -137,7 +134,7 @@ export default function App() {
             onUploadComplete={handleUploadComplete}
           />
         </div>
-      </header>
+      </div>
 
       {/* Content Container */}
       <main className=" sm:p-0 w-full h-full mt-4 p-4 md:p-8 lg:p-10 rounded-lg shadow-lg flex flex-col justify-between">
@@ -157,8 +154,8 @@ export default function App() {
                 ) : (
                   <img
                     src={chatlogo}
-                    alt="AI Planet"
-                    className="h-8 w-8 md:h-8 md:w-8"
+                    alt="AI PDF Chat"
+                    className="-ml-1.5 h-10 w-10 md:h-7 md:-pl-5 md:w-auto border-0 border-gray-700"
                   />
                 )}
                 {/* Display message */}

@@ -6,6 +6,9 @@ import reportWebVitals from './reportWebVitals';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+// use for specifying the backend api service url
+window.backendURL = 'https://darkboy18-pdf-chatter.sliplane.app'
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

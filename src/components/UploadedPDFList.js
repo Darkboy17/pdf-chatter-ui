@@ -11,7 +11,7 @@ function UploadedPDFList({
 
   // State variables
 
-  const backendURL = process.env.REACT_APP_API_BACKEND_URL;
+  const backendURL = window.backendURL;
 
   const [pdfFiles, setPdfFiles] = useState([]);
   const [selectedPDF, setSelectedPDF] = useState();

@@ -3,7 +3,7 @@ import axios from "axios";
 
 const AskQuestion = ({ onSend, documentId, onReceiveResponse }) => {
 
-  const backendURL = process.env.REACT_APP_API_BACKEND_URL;
+  const backendURL = window.backendURL;
 
   // State variable to store user input
   const [inputText, setInputText] = useState("");

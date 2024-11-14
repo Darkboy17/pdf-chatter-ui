@@ -14,7 +14,7 @@ export default function App() {
 
   // State variables
 
-  const backendURL = process.env.REACT_APP_API_BACKEND_URL;
+  const backendURL = window.backendURL;
 
   // for storing the currently selected PDF
   const [selectedPDF, setSelectedPDF] = useState(null);

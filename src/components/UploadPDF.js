@@ -7,7 +7,7 @@ function UploadPDF({ onFileUpload = () => {}, onUploadComplete }) {
 
   // State variables
 
-  const backendURL = process.env.REACT_APP_API_BACKEND_URL;
+  const backendURL = window.backendURL;
 
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);

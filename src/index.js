@@ -7,7 +7,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // use for specifying the backend api service url
-window.backendURL = 'https://darkboy18-pdf-chatter.sliplane.app'
+window.backendURL = 'http://129.154.250.228:8000' // url from oracle cloud
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

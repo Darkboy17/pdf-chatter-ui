@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "AI PDF Chatter",
+  "name": "An AI powered app allowing users to chat with uploaded PDFs",
   "icons": [
     {
       "src": "favicon.ico",

@@ -7,7 +7,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // use for specifying the backend api service url
-window.backendURL = 'https://129.154.250.228:8000' // url from oracle cloud
+window.backendURL = 'https://pdfchatapi.largent.org' // url from oracle cloud + freednsafraid.org + let's encrypt
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

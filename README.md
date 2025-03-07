@@ -1,70 +1,95 @@
-# Getting Started with Create React App
+# AI PDF Chatter
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[Live Demo](https://pdf-chatter-ui.vercel.app) 
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+AI PDF Chatter is an AI-powered application that enables users to **upload PDF documents** and **ask questions interactively** based on the document's content. The app leverages **LlamaIndex** for natural language processing, **FastAPI** for the backend, and **React.js & Tailwind CSS** for a sleek, responsive frontend. **SQLite** is used to manage document metadata, while **Sliplane** handles web service integration.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Features
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Upload PDFs**: Users can upload documents for processing.
+- **AI-Powered Q&A**: Ask questions and receive document-specific answers.
+- **FastAPI Backend**: High-performance API for handling document processing.
+- **React.js Frontend**: Interactive and responsive UI.
+- **SQLite Database**: Efficient storage for document metadata.
+- **Dockerized Deployment**: Ensures smooth scalability and portability.
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech Stack
 
-### `npm run build`
+### Frontend:
+- **React.js** - Component-based UI for a seamless experience.
+- **Tailwind CSS** - Utility-first CSS framework for styling.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Backend:
+- **FastAPI** - High-performance Python framework for API development.
+- **LlamaIndex** - Enables natural language queries on document content.
+- **SQLite** - Lightweight database for managing document metadata.
+- **Sliplane** - Web service management for seamless API interaction.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Deployment:
+- **Docker** - Containerized deployment for efficiency.
+- **Oracle Cloud** - Scalable cloud hosting solution.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## Getting Started
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Prerequisites
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Node.js (for frontend)
+- Python 3.8+ (for backend)
+- Docker (for containerized deployment)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Installation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/ai-pdf-chatter.git
+   cd ai-pdf-chatter
+   ```
 
-## Learn More
+2. **Set up the Frontend**:
+   ```bash
+   cd frontend
+   npm install
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3. **Set up the Backend**:
+   ```bash
+   cd ../backend
+   pip install -r requirements.txt
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+4. **Configure Environment Variables**:
+   
+   - Create a `.env` file in the backend directory:
+     ```env
+     DATABASE_URL=sqlite:///./database.db
+     SECRET_KEY=your-secret-key
+     ```
+   
+   - Create a `.env.local` file in the frontend directory:
+     ```env
+     NEXT_PUBLIC_API_URL=http://localhost:8000
+     ```
 
-### Code Splitting
+5. **Run the Backend**:
+   ```bash
+   uvicorn main:app --reload
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+6. **Run the Frontend**:
+   ```bash
+   cd ../frontend
+   npm run dev
+   ```
 
-### Analyzing the Bundle Size
+7. **Access the App**:
+   - Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---

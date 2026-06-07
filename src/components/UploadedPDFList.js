@@ -1,253 +1,241 @@
-import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import pdflogo from "../icons/pdf_logo.svg";
 import { toast } from "react-toastify";
+import { api } from "../api";
 
 function UploadedPDFList({
+  onSelectPDF = () => {},
   onDocumentIdChange,
   refreshTrigger,
   onallDocsDeleted,
 }) {
-
-  // State variables
-
-  const backendURL = window.backendURL;
-
   const [pdfFiles, setPdfFiles] = useState([]);
-  const [selectedPDF, setSelectedPDF] = useState();
+  const [selectedPDF, setSelectedPDF] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const [documentID, setdocumentID] = useState(null);
-
-  // Ref for dropdown element to be used for closing of the PDF list
+  const [pendingDeletePDF, setPendingDeletePDF] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Function to handle PDF deletion
-  const handleDelete = (filename, event) => {
+  const handleSelectPDF = useCallback(
+    async (filename) => {
+      setSelectedPDF(filename);
+      setShowDropdown(false);
+      onSelectPDF(filename);
 
-    event.stopPropagation(); // Prevent triggering handleSelectPDF
-
-    setPdfFiles((prevFiles) => {
-      const pdfFiles = prevFiles.filter((file) => file !== filename);
-
-      // Clear selectedPDF if no files are left
-      if (pdfFiles.length === 0) {
-
-        setSelectedPDF(null);
-
-        // Use setTimeout to defer onallDocsDeleted call
-        if (onallDocsDeleted) {
-          setTimeout(() => onallDocsDeleted(), 3500);
-        }
+      try {
+        const response = await api.get("/get-document-id/", {
+          params: { filename },
+        });
+        onDocumentIdChange(response.data.document_id);
+      } catch (error) {
+        toast.error(error.response?.data?.detail || "Unable to open this PDF.");
       }
+    },
+    [onDocumentIdChange, onSelectPDF]
+  );
 
-      return pdfFiles;
-    });
-
-    handleDeletePDF(documentID);
+  const handleRequestDelete = (filename, event) => {
+    event.stopPropagation();
+    setPendingDeletePDF(filename);
   };
 
-  // Fetch existing PDFs from the database
-  const fetchPDFs = async () => {
-
-    setLoading(true); // Start loading
-
-    try {
-
-      const response = await axios.get(`${backendURL}/list-uploads/`);
-
-      setPdfFiles(response.data); // Assuming response data is an array of file names
-
-      if (response.data.length > 0) {
-
-        const lastPDF = response.data[response.data.length - 1];
-
-        setSelectedPDF(lastPDF); // Set the last PDF as selected
-
-        handleSelectPDF(lastPDF); // Automatically select the last PDF
-
-      }
-    } catch (error) {
-
-      toast.info(
-        "No existing PDFs exists. Please upload a PDF file to start chatting."
-      );
-
-    } finally {
-
-      // Show spinner for n seconds, then show the selected PDF
-      const timer = setTimeout(() => setLoading(false), 0);
-
-      return () => clearTimeout(timer); // Clean up the timer on component unmount
-
+  const handleDelete = async () => {
+    if (!pendingDeletePDF || deleting) {
+      return;
     }
-  };
 
-  // Function to handle PDF deletion again for more readability
-  const handleDeletePDF = async (documentId) => {
-
-    //setDeletingFile(documentId);
-
+    const filename = pendingDeletePDF;
+    setDeleting(true);
     try {
+      const idResponse = await api.get("/get-document-id/", {
+        params: { filename },
+      });
+      const response = await api.delete(`/delete-pdf/${idResponse.data.document_id}`);
+      const remainingFiles = pdfFiles.filter((file) => file !== filename);
 
-      // Make an API call to delete the PDF and its index by document ID
-      const response = await axios.delete(
-        `${backendURL}/delete-pdf/${documentId}`
-      );
-
+      setPdfFiles(remainingFiles);
       toast.success(response.data.message);
 
-    } catch (error) {
-
-      toast.error("Error deleting PDF:", error);
-
-    } finally {
-
-
-      if (pdfFiles.length === 0) setSelectedPDF(null);
-
-    }
-  };
-
-  // Toggle dropdown visibility
-  const handlePDFClick = () => {
-
-    setShowDropdown((prev) => !prev); // Toggle the dropdown visibility
-
-  };
-
-  // Handle selection of a PDF
-  const handleSelectPDF = async (filename) => {
-
-    setSelectedPDF(filename); // Set the clicked file as the selected file
-
-    setShowDropdown(false); // Close the dropdown
-
-    // Fetch document_id for the selected PDF
-    try {
-
-      const response = await axios.get(
-        `${backendURL}/get-document-id/`,
-        {
-          params: { filename },
+      if (remainingFiles.length === 0) {
+        setSelectedPDF(null);
+        setShowDropdown(false);
+        setPendingDeletePDF(null);
+        if (onallDocsDeleted) {
+          onallDocsDeleted();
         }
-      );
-
-      setdocumentID(response.data.document_id);
-
-      onDocumentIdChange(response.data.document_id); // Pass document_id to parent
-
+      } else if (selectedPDF === filename) {
+        setPendingDeletePDF(null);
+        await handleSelectPDF(remainingFiles[remainingFiles.length - 1]);
+      } else {
+        setPendingDeletePDF(null);
+      }
     } catch (error) {
-
-      console.error("Failed to fetch document ID", error);
-
+      toast.error(error.response?.data?.detail || "Error deleting PDF.");
+    } finally {
+      setDeleting(false);
     }
   };
 
-  // Close dropdown if clicked outside
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setShowDropdown(false);
+  const fetchPDFs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await api.get("/list-uploads/");
+      const files = Array.isArray(response.data) ? response.data : [];
+      setPdfFiles(files);
+
+      if (files.length > 0) {
+        await handleSelectPDF(files[files.length - 1]);
+      } else {
+        setSelectedPDF(null);
+      }
+    } catch (error) {
+      toast.info("Upload a PDF file to begin chatting.");
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [handleSelectPDF]);
 
-  // Effect to clear selected PDF when PDF list changes
   useEffect(() => {
-    if (pdfFiles.length === 0 && selectedPDF !== null) {
-      setSelectedPDF(null); // Clear selected PDF if no files remain
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
 
-      if (onallDocsDeleted) onallDocsDeleted(); // Notify parent only when pdfFiles is empty
-    }
-  }, [pdfFiles, selectedPDF, onallDocsDeleted]);
-
-  // Add event listener for clicking outside the pdf list
-  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Refresh PDF list when refreshTrigger changes
   useEffect(() => {
-    if (refreshTrigger !== 0) {
-      fetchPDFs();
-      refreshTrigger = 0; // Reset the trigger after fetching
-    }
-  }, [refreshTrigger]);
-
+    fetchPDFs();
+  }, [fetchPDFs, refreshTrigger]);
 
   return (
-    <div className="mb-10 md:mt-8">
-      <div className="flex">
-        {selectedPDF && (
-          <img
-            src={pdflogo}
-            alt="AIP Logo"
-            className="h-6 w-6 mt-2 md:mt-1 mx-5"
-          />
+    <div className="mt-6 border-t border-slate-100 pt-5" ref={dropdownRef}>
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+          Active PDF
+        </p>
+        {!loading && pdfFiles.length > 0 && (
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+            {pdfFiles.length}
+          </span>
         )}
-        <span
-          id="pdf-name"
-          onClick={handlePDFClick}
-          className="text-green-600 py-1 rounded-full text-xs sm:text-sm font-medium cursor-pointer"
-        >
-          {loading ? (
-            <svg
-              className="h-5 w-5 animate-spin text-green-500"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              ></path>
-            </svg>
-          ) :selectedPDF && (
-            <>
-            {selectedPDF.replace(/_/g, " ")} 
-            </>
-              
-          )}
-        </span>
       </div>
 
-      {/* Custom dropdown */}
-      {showDropdown && (
-        <div
-          ref={dropdownRef}
-          className="fixed text-xs md:text-sm mt-2 w-60 md:w-auto overflow-y-auto max-h-96 bg-white border border-gray-300 rounded-lg shadow-lg z-50"
-        >
-          {pdfFiles.map((filename, index) => (
-            <div
-              key={index}
-              onClick={() => handleSelectPDF(filename)}
-              className="border-2 border-gray-100 p-3 flex items-center justify-between px-4 py-2 hover:bg-teal-100 cursor-pointer transition duration-500 ease-in-out"
-            >
-              {/* Filename */}
-              <div className="flex w-full items-center">
-                <span className="">{filename}</span>
-              </div>
+      {loading ? (
+        <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm text-slate-500">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
+          Loading documents
+        </div>
+      ) : pdfFiles.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 p-4 text-sm leading-6 text-slate-500">
+          No PDF files uploaded yet.
+        </div>
+      ) : (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowDropdown((previous) => !previous)}
+            className="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 text-left transition hover:border-emerald-200 hover:bg-emerald-50/40"
+            aria-expanded={showDropdown}
+            aria-haspopup="listbox"
+          >
+            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-rose-50">
+              <img src={pdflogo} alt="" className="h-6 w-6" />
+            </span>
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700">
+              {selectedPDF?.replace(/_/g, " ")}
+            </span>
+            <svg viewBox="0 0 20 20" className="h-4 w-4 flex-shrink-0 text-slate-400" fill="currentColor">
+              <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clipRule="evenodd" />
+            </svg>
+          </button>
 
-              {/* Delete Icon */}
+          {showDropdown && (
+            <div
+              className="absolute left-0 right-0 top-full z-30 mt-2 max-h-72 overflow-y-auto rounded-xl border border-slate-100 bg-white p-2 shadow-xl shadow-slate-900/10"
+              role="listbox"
+            >
+              {pdfFiles.map((filename) => (
+                <div
+                  key={filename}
+                  className={`group flex items-center gap-2 rounded-lg px-2 py-2 transition ${
+                    selectedPDF === filename ? "bg-emerald-50" : "hover:bg-slate-50"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSelectPDF(filename)}
+                    className="min-w-0 flex-1 truncate px-2 py-1 text-left text-sm text-slate-700"
+                    role="option"
+                    aria-selected={selectedPDF === filename}
+                  >
+                    {filename.replace(/_/g, " ")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(event) => handleRequestDelete(filename, event)}
+                    className="rounded-lg px-2 py-1 text-xs font-medium text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                    aria-label={`Delete ${filename}`}
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {pendingDeletePDF && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="delete-pdf-dialog-title"
+          aria-describedby="delete-pdf-dialog-description"
+        >
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl shadow-slate-900/20">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 6h18" />
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+              </svg>
+            </div>
+            <h2 id="delete-pdf-dialog-title" className="mt-5 text-xl font-semibold text-slate-900">
+              Delete this PDF?
+            </h2>
+            <p id="delete-pdf-dialog-description" className="mt-2 text-sm leading-6 text-slate-500">
+              This will remove{" "}
+              <span className="font-medium text-slate-700">
+                {pendingDeletePDF.replace(/_/g, " ")}
+              </span>{" "}
+              from your uploaded documents.
+            </p>
+            <div className="mt-7 flex gap-3">
               <button
-                onClick={(event) => handleDelete(filename, event)}
-                className={`text-red-500 hover:bg-red-400 hover:text-white flex mx-4 border-2 border-gray-100 p-1 `}
+                type="button"
+                onClick={() => setPendingDeletePDF(null)}
+                disabled={deleting}
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Delete
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 rounded-xl bg-rose-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-rose-700 disabled:cursor-wait disabled:opacity-70"
+              >
+                {deleting ? "Deleting..." : "Delete PDF"}
               </button>
             </div>
-          ))}
+          </div>
         </div>
       )}
     </div>

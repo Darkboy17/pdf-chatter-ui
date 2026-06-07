@@ -1,0 +1,50 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Local environment and secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*firebase-adminsdk*.json
+
+# Local databases and generated storage
+*.db
+*.sqlite
+*.sqlite3
+database.db
+uploads/
+chroma_db/
+
+# Logs and runtime output
+*.log
+logs/
+tmp/
+temp/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Docker and VCS metadata
+.git/
+.gitignore
+Dockerfile
+.dockerignore
+

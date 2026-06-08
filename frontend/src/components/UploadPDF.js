@@ -94,6 +94,12 @@ function UploadPDF({ onFileUpload = () => { }, onUploadComplete = () => { } }) {
         onChange={handleFileChange}
         className="hidden"
       />
+      <div className=" border-green-400 flex justify-end">
+        <p className="mt-0 text-xs text-pretty leading-6 text-slate-500">
+          PDF should be at most 1MB
+        </p>
+      </div>
+      
     </div>
   );
 }

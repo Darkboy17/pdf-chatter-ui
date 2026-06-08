@@ -35,17 +35,16 @@ def _collection_name(session_id: str, document_id: int) -> str:
 def _vector_store(session_id: str, document_id: int):
     client = _client()
     collection_name = _collection_name(session_id, document_id)
-    try:
-        collection = client.get_collection(collection_name)
-    except NotFoundError:
-        collection = client.create_collection(
-            name=collection_name,
-            metadata={
-                "session_id": session_id,
-                "document_id": str(document_id),
-                "index_version": INDEX_VERSION,
-            },
-        )
+
+    collection = client.get_or_create_collection(
+        name=collection_name,
+        metadata={
+            "session_id": session_id,
+            "document_id": str(document_id),
+            "index_version": INDEX_VERSION,
+        },
+    )
+
     return collection, ChromaVectorStore(chroma_collection=collection)
 
 
@@ -117,8 +116,13 @@ def load_index(
 
 
 def delete_index(session_id: str, document_id: int):
+    collection_name = _collection_name(session_id, document_id)
+
     try:
-        _client().delete_collection(_collection_name(session_id, document_id))
+        _client().delete_collection(name=collection_name)
     except NotFoundError:
-        # Deleting a document that has not been indexed in Chroma is harmless.
         return
+    except ValueError as e:
+        if "does not exist" in str(e):
+            return
+        raise

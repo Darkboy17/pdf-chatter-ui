@@ -3,7 +3,7 @@ import uploadlogo from "../icons/upload_logo.svg";
 import { toast } from "react-toastify";
 import { api } from "../api";
 
-function UploadPDF({ onFileUpload = () => {}, onUploadComplete = () => {} }) {
+function UploadPDF({ onFileUpload = () => { }, onUploadComplete = () => { } }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -27,19 +27,45 @@ function UploadPDF({ onFileUpload = () => {}, onUploadComplete = () => {} }) {
 
     try {
       const response = await api.post("/upload-pdf/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 300000,
       });
 
       if (response.data?.document_id) {
-        onFileUpload(response.data.document_id);
-        onUploadComplete(response.data.filename);
         toast.success(`Uploaded ${response.data.filename} successfully.`);
+
+        try {
+          onFileUpload(response.data.document_id);
+          onUploadComplete(response.data.filename);
+        } catch (callbackError) {
+          console.error("Upload succeeded, but UI callback failed:", callbackError);
+          toast.warn("Upload succeeded, but the file list could not refresh.");
+        }
       } else if (response.data?.duplicate) {
         toast.warn(response.data.message);
       }
     } catch (error) {
+      console.error("Upload failed:", {
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers,
+        requestUrl: error.config?.url,
+        baseURL: error.config?.baseURL,
+        timeout: error.config?.timeout,
+      });
+
+      const detail = error.response?.data?.detail;
+
       const errorMessage =
-        error.response?.data?.detail || "Failed to upload PDF. Please try again.";
+        typeof detail === "string"
+          ? detail
+          : detail
+            ? JSON.stringify(detail)
+            : error.code === "ECONNABORTED"
+              ? "Upload timed out while indexing. The PDF may still finish processing on the server."
+              : error.message || "Failed to upload PDF. Please try again.";
+
       toast.error(errorMessage);
     } finally {
       setUploading(false);

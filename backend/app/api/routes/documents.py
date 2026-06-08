@@ -66,8 +66,8 @@ def delete_pdf(
     if file_path.exists():
         file_path.unlink()
 
-    document_repo.delete_document(conn, document_id, session_id)
     vector_service.delete_index(session_id, document_id)
+    document_repo.delete_document(conn, document_id, session_id)
 
     return {
         "status": "success",

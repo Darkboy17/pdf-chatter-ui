@@ -1,4 +1,5 @@
 import os
+import logging
 
 from app.core.ai import init_ai
 from fastapi import Depends, FastAPI, HTTPException
@@ -13,6 +14,10 @@ from app.core.firebase_auth import get_current_user
 init_ai()
 
 app = FastAPI()
+
+
+
+logging.basicConfig(level=logging.INFO)
 
 @app.on_event("startup")
 def on_startup():
